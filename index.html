@@ -1,0 +1,1014 @@
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guía del Animador CEL</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <style>
+        html { scroll-behavior: smooth; }
+        body { font-family: 'Inter', sans-serif; }
+        /* Ocultar scrollbars */
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        
+        /* Botones de Día */
+        .day-button {
+            background-color: #003366; /* Azul La Salle */
+            color: white;
+            padding: 1.25rem 0.75rem;
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            font-weight: 500;
+            transition: all 0.2s ease-in-out;
+            line-height: 1.4;
+        }
+        .day-button:hover {
+            background-color: #004488; /* Azul más oscuro */
+            transform: translateY(-2px);
+        }
+        
+        /* Acordeón de Visitas */
+        .accordion-header {
+            background-color: white;
+            border-radius: 0.5rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .accordion-header:hover { background-color: #f9fafb; }
+        .accordion-content {
+            background-color: #f9fafb;
+            border: 1px solid #f3f4f6;
+            border-top: none;
+            border-radius: 0 0 0.5rem 0.5rem;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05) inset;
+        }
+        /* Estilos para el texto formateado (párrafos, listas) */
+        .prose-formatted p {
+            margin-bottom: 0.75rem;
+            line-height: 1.6;
+            color: #374151; /* text-gray-700 */
+        }
+        .prose-formatted p:last-child { margin-bottom: 0; }
+        .prose-formatted h4 {
+            font-weight: 600; /* semibold */
+            color: #003366; /* Azul La Salle */
+            margin-top: 1rem;
+            margin-bottom: 0.5rem;
+            border-bottom: 1px solid #e5e7eb;
+            padding-bottom: 4px;
+        }
+         .prose-formatted ul {
+            list-style-type: disc;
+            margin-left: 1.25rem;
+            margin-bottom: 0.75rem;
+            color: #374151;
+        }
+         .prose-formatted li { margin-bottom: 0.25rem; }
+        .prose-formatted b, .prose-formatted strong { color: #1f2937; /* text-gray-800 */ }
+        .prose-formatted i, .prose-formatted em { color: #4b5563; /* text-gray-600 */ }
+         .prose-formatted ul ul { margin-top: 0.5rem; }
+
+        .accordion-arrow { transition: transform 0.3s ease; }
+        .rotate-180 { transform: rotate(180deg); }
+    </style>
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { 'inter': ['Inter', 'sans-serif'] },
+                    colors: { 'lasalle-blue': '#003366', 'lasalle-gold': '#FFD700' }
+                }
+            }
+        }
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+</head>
+<body class="bg-gray-100">
+
+    <div id="app-container" class="max-w-lg mx-auto min-h-screen shadow-xl bg-gray-100">
+
+        <div id="home-screen">
+            <header class="bg-lasalle-blue text-white p-4 shadow-lg sticky top-0 z-10">
+                <div class="flex items-center space-x-3">
+                    <img src="Logo base@2x-8.png" alt="Logo La Salle" class="h-12 w-12" onerror="this.src='https://placehold.co/100x100/003366/FFFFFF?text=La+Salle&font=inter'">
+                    <div>
+                        <h1 class="text-xl font-bold">Guía del Animador</h1>
+                        <h2 class="text-md opacity-80">Peregrinación CEL 2025</h2>
+                    </div>
+                </div>
+            </header>
+            <main class="p-4">
+                <h3 class="text-lg font-semibold text-gray-700 mb-4">Selecciona un día:</h3>
+                <div id="day-buttons-container" class="grid grid-cols-2 gap-4">
+                    </div>
+            </main>
+        </div>
+
+        <div id="day-screen" class="hidden">
+            <header class="sticky top-0 bg-white shadow-md z-10 flex items-center p-4">
+                <button onclick="showHome()" class="text-lasalle-blue p-2 rounded-full hover:bg-gray-100">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
+                    </svg>
+                </button>
+                <h1 id="day-title" class="text-lg font-bold text-lasalle-blue ml-2 truncate">...</h1>
+            </header>
+            
+            <main class="no-scrollbar pb-4">
+                <img id="day-image" src="" alt="Cabecera del Día" class="w-full h-40 object-cover bg-gray-200" onerror="this.src='https://placehold.co/600x240/003366/FFFFFF?text=Roma&font=inter'">
+                
+                <div class="p-4 space-y-4">
+                    <div class="bg-white p-4 rounded-lg shadow">
+                        <h3 class="text-lg font-semibold text-gray-800 mb-3 border-b pb-2">Horario de la jornada</h3>
+                        <ul id="day-horario" class="list-disc list-inside text-gray-700 space-y-1">
+                            </ul>
+                    </div>
+
+                    <div id="day-visitas" class="space-y-3">
+                        </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script>
+        // -----------------------------------------------------------------
+        // DATOS DE LA GUÍA (INTEGRADOS DESDE EL DOCUMENTO)
+        // -----------------------------------------------------------------
+        
+        const appData = {
+            "dia1": {
+                "day_id": "dia1",
+                "titulo_dia": "Día 1: ¿Quién soy yo? Excavando en mi historia",
+                "url_imagen_cabecera": "https://images.unsplash.com/photo-1552832230-c01970b5eb56?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1374&q=80",
+                "horario_lista": [
+                    "7:30 Desayuno",
+                    "8:00 Salir",
+                    "(Visitas: Circo Massimo, Santa Maria in Cosmedin)",
+                    "11:30 San Clemente",
+                    "13:00 Tiempo libre en los aledaños del Forum Magnum (Cestino)",
+                    "16:00 Plaza de España",
+                    "19:30 Cena en la Casa Generalizia",
+                    "20:30 Dinámica: Sampietrini",
+                    "21:30 Oración (Cierre del día)"
+                ],
+                "visitas": [
+                    {
+                        "visita_id": "1.1",
+                        "titulo_visita": "Circo Massimo: triunfos y fracasos",
+                        "datos_historicos": `
+                            <p>Se sitúa en el Valle Murcia, entre dos de las siete colinas fundacionales de Roma: el <b>Palatino</b> (donde Rómulo fundó la ciudad) y el <b>Aventino</b> (donde Remo tuvo su augurio).</p>
+                            <p>Fue la mayor pista de carreras de cuadrigas de Roma, siendo los <i>aurigas</i> (conductores) auténticos héroes populares, compitiendo con los gladiadores en fama.</p>
+                            <p>Sus dimensiones eran colosales: <b>621 metros de largo</b> por <b>118 de ancho</b>. En su apogeo (S. II d.C.), podía albergar entre <b>150.000 y 250.000 espectadores</b> sentados (el Coliseo solo 50.000).</p>
+                            <p>La pista estaba dividida por la <i>spina</i> (mediana elevada), decorada con estatuas y dos grandes obeliscos egipcios.</p>
+                            <p>Uno de esos obeliscos es el <b>Obelisco Flaminio</b> (que el Papa Sixto V trasladó a la Piazza del Popolo). El otro es el <b>Obelisco Lateranense</b> (el más grande de Roma, ahora en San Juan de Letrán).</p>
+                            <p>La última carrera de cuadrigas registrada aquí fue en el <b>549 d.C.</b> Tras la caída del imperio, la piedra de sus gradas fue saqueada para construir otras iglesias y palacios.</p>
+                        `,
+                        "dinamica": `
+                            <p><b>Objetivo:</b> Reconocer los triunfos y fracasos de la propia historia.</p>
+                            <p><b>Acción:</b> Dar dos vueltas al Circo. La primera "desde arriba" (terreno liso, visión de espectador). La segunda "baja a la arena" (terreno irregular, visión del auriga).</p>
+                            <p><b>Reflexión (en la <i>Porta Triunphalis</i>):</b> Analizar qué dicen de ti tus triunfos y qué dicen de ti tus fracasos (p. 35).</p>
+                        `
+                    },
+                    {
+                        "visita_id": "1.2",
+                        "titulo_visita": "Bocca della Verità: mi historia, mi verdad",
+                        "datos_historicos": `
+                            <p>La <i>Bocca della Verità</i> es una antigua máscara de mármol del siglo I, de 1.75m de diámetro.</p>
+                            <p>No se sabe su utilidad original: pudo ser una fuente o (lo más probable) una tapa de alcantarilla de la <i>Cloaca Máxima</i> (el desagüe principal de Roma). El rostro se suele identificar con el dios <b>Océano</b>.</p>
+                            <p>La leyenda de que muerde la mano de los mentirosos es una invención medieval, popularizada mundialmente por la película <i>Vacaciones en Roma</i> (1953).</p>
+                            <p>La iglesia, <i>Santa Maria in Cosmedin</i> (S. VI), es una joya. Es una iglesia <i>sui iuris</i> (de rito griego-melquita). Su nombre viene del griego <i>kosmidion</i> ("bello"), ya que fue entregada a la comunidad griega que huía de las persecuciones iconoclastas.</p>
+                            <p><b>Dato curioso:</b> Además de la Boca, la iglesia conserva en una urna lateral el <b>cráneo coronado de flores de San Valentín</b>, el patrón de los enamorados.</p>
+                        `,
+                        "dinamica": `
+                            <p><b>Objetivo:</b> Decantar la "verdad" de la historia personal (éxitos y fracasos).</p>
+                            <p><b>Acción:</b> Tras el tiempo de reflexión en la basílica, los participantes se acercan a la <i>Bocca della Verità</i>.</p>
+                            <p><b>Reflexión:</b> Se les invita (con humor) a "contarle su verdad" y comprobar si son sinceros consigo mismos sobre el peso real de esos triunfos y fracasos (p. 36).</p>
+                        `
+                    },
+                    {
+                        "visita_id": "1.3",
+                        "titulo_visita": "San Clemente al Laterano: hasta tu siglo I",
+                        "datos_historicos": `
+                            <p>Es la "lasaña arqueológica" de Roma, un testimonio vivo de la historia vertical de la ciudad.</p>
+                            <p><b>Nivel 1 (S. XII - Actual):</b> Famosa por su deslumbrante mosaico absidal que representa el <b>Triunfo de la Cruz como Árbol de la Vida</b> (p. 39).</p>
+                            <p><b>Nivel 2 (S. IV - Inferior):</b> Basílica paleocristiana original.</p>
+                            <p><b>Nivel 3 (S. I - Subterráneo):</b> Edificios romanos, incluyendo una casa particular (posible <i>domus ecclesiae</i> o casa-iglesia primitiva) y un <b>Mitreo</b> (templo pagano S. II) con el altar de Mitra matando al toro.</p>
+                            <p><b>Santos:</b> Dedicada a San Clemente (tercer sucesor de Pedro). Los Santos Cirilo y Metodio trajeron sus restos a Roma, y la tumba de <b>San Cirilo</b> (inventor del alfabeto cirílico) se venera aquí (p. 39).</p>
+                            <p><b>Dato curioso:</b> En los frescos de la basílica inferior (S. IV) se encuentra una de las <b>primeras inscripciones conocidas en lengua vulgar italiana</b>. Es un "bocadillo" donde un patricio romano, Sisinio, grita a sus siervos: <i>"Fili de le pute, traite!"</i> ("Hijos de p..., ¡tirad!").</p>
+                        `,
+                        "dinamica": `
+                            <p><b>Objetivo:</b> Usar la excavación física como metáfora de la excavación interior.</p>
+                            <p><b>Reflexión (p. 39):</b> El texto enfatiza que para llegar al origen (S. I) los arqueólogos tuvieron que sacar "mucha tierra y escombros" e "ir más allá de lo aparente".</p>
+                            <p><b>Invitación (p. 40):</b> Se invita al peregrino a hacer de arqueólogo de su propia vida, descender a su "siglo I" (su esencia), aceptando que encontrará "tierra y escombros" (dificultades) en el camino.</p>
+                        `
+                    },
+                    {
+                        "visita_id": "1.4",
+                        "titulo_visita": "Piazza di Spagna: presente, pasado y futuro",
+                        "datos_historicos": `
+                            <p>La monumental escalinata tiene <b>135 peldaños</b> y fue inaugurada por el Papa Benedicto XIII en el Jubileo de 1725.</p>
+                            <p><b>Conexión Franco-Española:</b> Fue un acto de diplomacia. Financiada por Francia para celebrar la paz y conectar la <i>Piazza di Spagna</i> (sede de la <b>Embajada de España ante la Santa Sede</b>, considerada la misión diplomática permanente más antigua del mundo, establecida en 1647) con la iglesia francesa de <i><b>Trinità dei Monti</b></i> (p. 44).</p>
+                            <p><b>Columna:</b> La <b>Columna de la Inmaculada Concepción</b> (1857) fue erigida por 220 bomberos, quienes repiten la hazaña cada 8 de diciembre colocando flores (p. 44).</p>
+                            <p><b>Keats:</b> En la casa a la derecha de la escalinata (mirando hacia arriba) vivió y murió el poeta romántico inglés <b>John Keats</b> en 1821. Hoy es el museo Keats-Shelley.</p>
+                        `,
+                        "dinamica": `
+                            <p><b>Objetivo:</b> Sintetizar el pasado y el presente para proyectar el futuro.</p>
+                            <p><b>Metáfora:</b> La excavación (San Clemente) requiere un ascenso (la escalinata) (p. 44).</p>
+                            <p><b>Acción:</b> Subir la escalinata parando en las tres terrazas (p. 44-45).</p>
+                            <ul>
+                                <li><b>1a Terraza (p. 45):</b> "Mi ayer... qué fue importante" (Pasado).</li>
+                                <li><b>2a Terraza (p. 46):</b> "Hoy... algo que..." (Presente: Quiero, Temo, Busco, Agradezco...).</li>
+                                <li><b>3a Terraza (p. 47):</b> "Mañana... quisiera..." (Futuro).</li>
+                            </ul>
+                        `
+                    },
+                    {
+                        "visita_id": "1.5",
+                        "titulo_visita": "Sampietrini: Via vitalis",
+                        "datos_historicos": `
+                            <p>Los <i>sampietrini</i> son los adoquines de pórfido negro típicos de Roma, que toman su nombre de la Plaza de San Pedro. Introducidos por Sixto V, drenan bien pero son resbaladizos (p. 48).</p>
+                            <p>Las <b>calzadas romanas</b> (como la <i>Via Appia</i>, 312 a.C.) eran la red de comunicación del imperio, sumando más de 100.000 km. Se construían meticulosamente por capas y dieron lugar al proverbio "Todos los caminos llevan a Roma" (p. 48).</p>
+                            <p>El <i>pórfido</i> es una roca volcánica durísima. Su color (a veces púrpura) se asociaba en la antigüedad con la <b>realeza imperial</b>.</p>
+                        `,
+                        "dinamica": `
+                            <p><b>Objetivo:</b> Crear una síntesis física del día (<i>Via Vitalis</i> o "Camino de la Vida").</p>
+                            <p><b>Acción (p. 49):</b> Construir un "Cubo-Sampietrino" de 6 caras. 1 cara = Pasado (de la 1ª terraza), 1 = Presente (de la 2ª), 1 = Futuro (de la 3ª). Las 3 restantes son libres.</p>
+                            <p><b>Oración (p. 50):</b> Compartir los cubos, formar un camino con ellos, encender una vela y rezar con las lecturas (Dt 8, 2; Pv 3, 5-6; Jn 14, 6).</p>
+                        `
+                    },
+                    {
+                        "visita_id": "1.6",
+                        "titulo_visita": "Via vitalis (Diálogo con el Fundador)",
+                        "datos_historicos": `
+                            <p>(Esta es la oración de cierre del día, no tiene datos históricos, solo la dinámica).</p>
+                        `,
+                        "dinamica": `
+                            <p><b>Objetivo:</b> Iniciar el diálogo personal con el Fundador.</p>
+                            <p><b>Reflexión (p. 51):</b> El texto conecta al peregrino ("vivido en la arena de la vida") con La Salle ("también recorrió caminos llenos de triunfos y fracasos").</p>
+                            <p><b>Acción (p. 52):</b> Escribir un diálogo (como un guion de película) entre "La Salle y tú". El tema es el recorrido vital (el <i>sampietrino</i>).</p>
+                        `
+                    }
+                ]
+            },
+            "dia2": {
+                "day_id": "dia2",
+                "titulo_dia": "Día 2: En lo profundo...",
+                "url_imagen_cabecera": "https://images.unsplash.com/photo-1596205741632-19235953c89f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1374&q=80",
+                "horario_lista": [
+                    "7:30 Desayuno",
+                    "8:00 Salir en bus (Dinámica: Cuento 'El Diamante en el bolsillo')",
+                    "9:30 Visita a las Catacumbas de San Calixto",
+                    "(Tiempo libre para ir al Quo Vadis?)",
+                    "11:00 Bus hacia San Pablo Extramuros",
+                    "12:30 Bus hacia Piazza del Popolo",
+                    "13:00 Piazza del Popolo - Invitación a perderse",
+                    "17:00 Encontrarse en Il Gesù",
+                    "17:30 Macchina Barocca (Dinámica en Il Gesù)",
+                    "19:30 Cena en la Casa Generalizia",
+                    "20:30 Celebración: Unción sagrada"
+                ],
+                "visitas": [
+                    {
+                        "visita_id": "2.1",
+                        "titulo_visita": "Un diamante en tu bolsillo (Dinámica de Bus)",
+                        "datos_historicos": `
+                            <p>(Esta es la dinámica introductoria del día, que se realiza en el autobús de camino a las Catacumbas).</p>
+                        `,
+                        "dinamica": `
+                            <p><b>Acción:</b> Leer la leyenda del ladrón de diamantes que sigue a un mercader. El ladrón no encuentra el diamante. Al final, el mercader le revela que lo había escondido "¡en tu propio bolsillo!" (p. 62).</p>
+                            <p><b>Reflexión:</b> "Aquello que más buscamos, aquello que anhelamos... ya está dentro de nosotros". Esta es la metáfora clave del día.</p>
+                        `
+                    },
+                    {
+                        "visita_id": "2.2",
+                        "titulo_visita": "Catacombe di San Callisto: en lo profundo...",
+                        "datos_historicos": `
+                            <p>La ley romana prohibía enterrar en la ciudad, por eso las <i>necrópolis</i> (ciudades de muertos) están fuera de las murallas. Los cristianos preferían la inhumación (no incineración) y excavaron en el <i>tufo</i> (roca volcánica dócil).</p>
+                            <p>Datan del S. II al IV. Fueron abandonadas tras las invasiones bárbaras (S. V) y redescubiertas en el S. XIX por Juan Bautista de Rossi.</p>
+                            <p>Son de las más grandes: casi <b>20 kilómetros de largo</b> en galerías, distribuidas en <b>cuatro niveles</b> de profundidad. Albergaron cientos de miles de tumbas (los nichos se llaman <i>loculi</i>).</p>
+                            <p>Contienen la <b>"Cripta de los Papas"</b>, llamada "el pequeño Vaticano", donde se enterraron 9 Papas mártires del siglo III. También albergan la cripta de <b>Santa Cecilia</b>, patrona de la música.</p>
+                        `,
+                        "dinamica": `
+                            <p><b>Objetivo:</b> Conectar la fe de los mártires con la conciencia de la propia identidad ("el diamante").</p>
+                            <p><b>Reflexión (p. 63):</b> El texto enfatiza que los primeros cristianos eran "gente sencilla que defendió su manera de entender la vida" en un entorno hostil. "Ser uno mismo [...] no era sencillo".</p>
+                            <p><b>Invitación (p. 64):</b> La dinámica es una pregunta directa de introspección: "¿Y tú? ¿Te has parado alguna vez tranquilamente a pensar quién quieres ser? ¿Quién eres ahora? ¿Hacia dónde te diriges?".</p>
+                        `
+                    },
+                    {
+                        "visita_id": "2.3",
+                        "titulo_visita": "Quo Vadis?: ¿hacia dónde te diriges?",
+                        "datos_historicos": `
+                            <p>El nombre real es Santa María en Palmas. La leyenda narra el encuentro de San Pedro (huyendo de Roma) con Jesús.</p>
+                            <p>Pedro pregunta: <i>"Domine, quo vadis?"</i> (Señor, ¿a dónde vas?). Jesús responde: <i>"Eo romam iterum crucigi"</i> (Voy a Roma a que me crucifiquen). Pedro, avergonzado, regresa a Roma para enfrentar su martirio.</p>
+                            <p>La leyenda no es bíblica. Procede de los <b>"Hechos apócrifos de Pedro"</b> (finales del siglo II).</p>
+                            <p>Las "huellas" de Jesús que se ven en el centro son una copia. El relieve original se custodia, por seguridad, en la cercana Basílica de San Sebastián.</p>
+                        `,
+                        "dinamica": `
+                            <p><b>Objetivo:</b> Enfrentar la tentación de "huir" frente al compromiso de "regresar".</p>
+                            <p><b>Reflexión (p. 67):</b> El texto plantea la dualidad: "Marchar, huir... una de las tentaciones más habituales [...] ...o regresar... y dar la cara, enfrentarse a los problemas, ser consecuente".</p>
+                            <p><b>Invitación (p. 67):</b> Se interpela directamente al peregrino: "Y tú... <i>Quo Vadis?</i> [...] ¿Qué haces con tu vida? ¿qué quieres hacer?". Se proponen preguntas sobre el futuro, los miedos y los riesgos.</p>
+                        `
+                    },
+                    {
+                        "visita_id": "2.4",
+                        "titulo_visita": "San Paolo fuori le mura: la opción, las opciones",
+                        "datos_historicos": `
+                            <p>Es una de las cinco basílicas mayores y la segunda más grande de Roma (tras San Pedro), construida sobre la tumba del apóstol Pablo.</p>
+                            <p>La original de Constantino (S. IV) fue destruida por un <b>incendio devastador en 1823</b> (un obrero olvidó un brasero). La reconstrucción fue un proyecto internacional: el Zar Nicolás I de Rusia donó la malaquita y el lapislázuli de los altares; el Virrey de Egipto, las columnas de alabastro.</p>
+                            <p>Destacan los <b>tondos (retratos) de todos los Papas</b> en la nave. Existe una leyenda romana que dice que <b>cuando se llene el último espacio</b> (quedan unos 26 nichos vacíos), el mundo llegará a su fin.</p>
+                            <p>También es famoso su <b>claustro <i>cosmatesco</i></b> (S. XIII), una obra maestra de columnas salomónicas y mosaicos.</p>
+                        `,
+                        "dinamica": `
+                            <p><b>Objetivo:</b> Reflexionar sobre las "cadenas" que atan y las que liberan.</p>
+                            <p><b>Reflexión (p. 71):</b> Se conecta la conversión de Pablo ("caída del caballo") con la necesidad de parar. La metáfora central son las <b>cadenas</b> (visibles en el altar): "son un símbolo de opresión [...], pero también son un símbolo de todo lo contrario: precisamente por ser libre, Pablo fue apresado".</p>
+                            <p><b>Invitación (p. 72):</b> Se invita a "ver las dificultades no aparentes" y a "reconocer aquello que te ata o aquello que te libera" en los diferentes ámbitos de la vida.</p>
+                        `
+                    },
+                    {
+                        "visita_id": "2.5",
+                        "titulo_visita": "Perderse... para, quizás, encontrarse (Tiempo libre)",
+                        "datos_historicos": `
+                            <p><b>Punto de inicio:</b> Piazza del Popolo. Era la entrada norte a Roma, el primer lugar que veían los peregrinos.</p>
+                            <p><b>El Tridente:</b> Es el punto de inicio de las tres calles principales de Roma: <i>Via del Corso</i> (centro), <i>Via del Babuino</i> (izquierda, hacia Pza. Spagna) y <i>Via di Ripetta</i> (derecha, hacia el Panteón).</p>
+                            <p><b>Iglesias Gemelas:</b> Las iglesias (Santa Maria in Montesanto y Santa Maria dei Miracoli) no son idénticas. Para ajustarse simétricamente a las calles del Tridente, una tiene una cúpula ovalada y la otra una cúpula circular.</p>
+                        `,
+                        "dinamica": `
+                            <p><b>Objetivo:</b> Dar tiempo personal para decantar la pregunta <i>Quo Vadis?</i>.</p>
+                            <p><b>Acción (p. 75):</b> Es un tiempo libre ("Tú decides. Es un tiempo para ti"). Se anima a "perderse" y "encontrarse", pero con "los ojos abiertos, muy abiertos".</p>
+                            <p><b>Reflexión:</b> Las preguntas clave son: "¿Qué estás buscando hoy?" y "¿Cómo está tu diamante en este momento? ¿Por dónde brilla más? ¿Por dónde necesita un pulido?".</p>
+                        `
+                    },
+                    {
+                        "visita_id": "2.6",
+                        "titulo_visita": "Il Gesù: en lo oculto...",
+                        "datos_historicos": `
+                            <p>Es la iglesia madre de la Compañía de Jesús, símbolo de la <b>Contrarreforma</b>. Iniciada por San Ignacio (1551).</p>
+                            <p>La fachada de Giacomo della Porta es "la primera verdaderamente barroca".</p>
+                            <p>El diseño de la iglesia (una sola nave ancha, capillas laterales poco profundas, y un púlpito prominente) fue una respuesta directa al **Concilio de Trento (Contrarreforma)**. El objetivo era que la congregación pudiera ver y oír perfectamente al predicador, en contraposición a la liturgia medieval.</p>
+                            <p><b>La Bóveda:</b> La <i>Macchina Barocca</i> (el nombre de la dinámica) se refiere al espectacular fresco del <b>"Triunfo del Nombre de Jesús"</b>, obra de <b>Baciccio</b> (Giovanni Battista Gaulli, 1672-1685).</p>
+                            <p><b>Ilusionismo:</b> Es el culmen del ilusionismo barroco: la pintura (fresco) y la escultura (estuco) se fusionan y "desbordan" del marco arquitectónico, dando la sensación de que el cielo se abre y las figuras de los condenados caen sobre el espectador.</p>
+                            <p><b>El Reflector:</b> La iglesia tiene la tradición de activar un reflector a las <b>17:30</b> (vuestra hora de visita) que ilumina la bóveda, revelando su gloria.</p>
+                        `,
+                        "dinamica": `
+                            <p><b>Objetivo:</b> Conectar el "desvelar" lo oculto (la bóveda) con el "diamante" interior.</p>
+                            <p><b>Reflexión (p. 83):</b> Se utilizan textos de los Ejercicios Espirituales de San Ignacio. "Has visto lo que ha sucedido... aquello que estaba oculto se ha desvelado".</p>
+                            <p><b>Invitación (p. 83):</b> Se conecta explícitamente la revelación de la bóveda con el cuento del "Diamante en tu bolsillo" y la canción "En lo profundo".</p>
+                        `
+                    },
+                    {
+                        "visita_id": "2.7",
+                        "titulo_visita": "Unción sagrada (Cierre Día 2)",
+                        "datos_historicos": `
+                            <p>Se explica el origen hebreo (<i>masach</i> -> Mesías) y griego (<i>Kristos</i> -> Cristo) de la palabra "ungido" (p. 89).</p>
+                            <p><b>Lectura central:</b> El <b>Sueño de Jacob en Betel</b> (Gn 28). Jacob huye (conectando con <i>Quo Vadis?</i>), tiene el sueño, y unge la piedra que llama "Casa de Dios" (<i>Betel</i>) (p. 90-91).</p>
+                            <p><b>La Mezcla:</b> La unción se basa en la mezcla sagrada de Éxodo 30: Mirra (6kg), Casia (6kg), Canela (3kg), Cálamo (3kg) y Aceite de oliva (3,6l) (p. 100). Eran especias de lujo (Arabia, India) reservadas para reyes y sacerdotes.</p>
+                        `,
+                        "dinamica": `
+                            <p><b>Objetivo:</b> Consagrar la identidad ("diamante") descubierta.</p>
+                            <p><b>Dinámica Aromática (p. 94):</b> Los participantes eligen una lectura bíblica asociada a un aroma (Mirra, Incienso, Hisopo, Rosa de Sarón), huelen el aceite esencial y reflexionan sobre ella.</p>
+                            <p><b>Gesto Final (p. 100):</b> "Nosotros hoy somos esa piedra. Somos esa piedra que se unge y que es casa de Dios". Se ungen unos a otros.</p>
+                        `
+                    }
+                ]
+            },
+            "dia3": {
+                "day_id": "dia3",
+                "titulo_dia": "Día 3: El don gozoso de uno mismo",
+                "url_imagen_cabecera": "https://images.unsplash.com/photo-1547873218-80f0c088863f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1460&q=80",
+                "horario_lista": [
+                    "7:30 Desayuno",
+                    "8:00 Salir",
+                    "9:00 San Giovanni in laterano",
+                    "Santa Maria Maggiore",
+                    "San Pietro in Vincoli",
+                    "13:00 Comida en la Casa Generalizia",
+                    "Tiempo libre",
+                    "19:30 Cena en la Casa Generalizia o cestino"
+                ],
+                "visitas": [
+                    {
+                        "visita_id": "3.1",
+                        "titulo_visita": "San Giovanni in Laterano: la grandeza del don",
+                        "datos_historicos": `
+                            <p>Es la <b>Catedral de Roma</b> y la iglesia de rango más alto de la cristiandad (<i>"Madre y Cabeza de todas las iglesias de la urbe y del mundo"</i>), por encima incluso de San Pedro.</p>
+                            <p>Fue la primera basílica cristiana construida (consagrada en el <b>324 d.C.</b>). Se erigió sobre los cuarteles de los <i>Equites Singulares</i> (la guardia pretoriana de Majencio), que Constantino derrotó en la batalla del Puente Milvio.</p>
+                            <p>El palacio anexo (Palacio de Letrán) fue la <b>residencia oficial de los Papas durante 1.000 años</b>, antes de que se mudaran al Vaticano en el siglo XIV.</p>
+                            <p><b>Dato curioso:</b> Las enormes puertas centrales de bronce de la entrada principal son las <b>puertas originales de la <i>Curia Iulia</i></b> (el edificio del Senado Romano) traídas desde el Foro.</p>
+                            <p>Las colosales estatuas de los Apóstoles en la nave central (la base de la dinámica) son del S. XVIII (escuela de Borromini).</p>
+                        `,
+                        "dinamica": `
+                            <p><b>Objetivo:</b> Dimensionar el "don grandioso", el potencial máximo de uno mismo.</p>
+                            <p><b>Acción (p. 111-113):</b> Contemplar las estatuas de los Apóstoles en la nave central y analizar su iconografía (los símbolos que definen su misión: llaves de Pedro, cruz de Felipe, piel de Bartolomé, etc.).</p>
+                            <p><b>Reflexión (p. 113):</b> "Si un artista te tuviese que representar en tu máximo potencial, ¿cómo lo haría? ¿Cuál sería ese símbolo o atributo que definiría el impacto grandioso de tu don?".</p>
+                        `
+                    },
+                    {
+                        "visita_id": "3.2",
+                        "titulo_visita": "Santa Maria Maggiore: mi humilde rincón",
+                        "datos_historicos": `
+                            <p>Es la única de las cuatro basílicas mayores que conserva su **planta paleocristiana original** (S. V). Es el primer templo dedicado a la Virgen María tras el Concilio de Éfeso (431), que proclamó su maternidad divina.</p>
+                            <p><b>Leyenda (p. 116):</b> La tradición dice que la Virgen señaló su ubicación haciendo caer nieve en pleno agosto (5 de agosto) sobre la colina del Esquilino. Se la conoce como "Virgen de las Nieves".</p>
+                            <p><b>Reliquia (p. 116):</b> Alberga la reliquia de la "mangiatoia" (el pesebre o cuna) del Niño Jesús, en la cripta bajo el altar.</p>
+                            <p><b>Dato curioso:</b> El artesonado dorado del techo se dice que fue revestido con el **primer oro traído de América** por Cristóbal Colón, un regalo de los Reyes Católicos (Fernando e Isabel) al Papa Alejandro VI (Borgia).</p>
+                        `,
+                        "dinamica": `
+                            <p><b>Objetivo:</b> Equilibrar la grandeza (San Juan) con el "don humilde" (el origen).</p>
+                            <p><b>Reflexión (p. 117):</b> Se contrapone la grandeza de la basílica con la humildad de la reliquia (el pesebre) y la austeridad de las tumbas de Bernini y el Papa Francisco, que se encuentran aquí.</p>
+                            <p><b>Acción (p. 118):</b> Encontrar en la basílica o su entorno un objeto/textura (una gota de agua, un ladrillo desnudo, una esquina desgastada) que represente la "esencia más básica y pura" del propio don. Tomarle una foto.</p>
+                        `
+                    },
+                    {
+                        "visita_id": "3.3",
+                        "titulo_visita": "San Pietro in vincoli",
+                        "datos_historicos": `
+                            <p>Construida en el S. V para albergar la reliquia de las <b>cadenas (<i>vincoli</i>)</b> con las que ataron a San Pedro en Jerusalén (p. 121).</p>
+                            <p><b>Leyenda (p. 121):</b> La emperatriz Eudoxia regaló las cadenas al Papa León I. Cuando el Papa las comparó con las cadenas del encarcelamiento de Pedro en Roma (prisión Mamertina), ambas se unieron milagrosamente.</p>
+                            <p><b>El Moisés (p. 121):</b> La iglesia es mundialmente famosa por el <b>Moisés de Miguel Ángel</b> (finalizado en 1515). Es la figura central de lo que iba a ser la tumba monumental del Papa Julio II.</p>
+                            <p><b>Los "Cuernos" (p. 121):</b> Moisés tiene cuernos debido a un famoso error de traducción de San Jerónimo en la Vulgata. La palabra hebrea <i>karan</i> ("rayos de luz" o "resplandor") se tradujo por <i>keren</i> ("cuernos").</p>
+                        `,
+                        "dinamica": `
+                            <p><b>(No hay dinámica explícita en el cuaderno para esta visita, solo la nota histórica. Es una visita cultural que complementa el día).</b></p>
+                        `
+                    }
+                ]
+            },
+            "dia4": {
+                "day_id": "dia4",
+                "titulo_dia": "Día 4: Adoro en todo la voluntad del Señor en mi vida",
+                "url_imagen_cabecera": "https://images.unsplash.com/photo-1594819777937-456afa54c6b8?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1374&q=80",
+                "horario_lista": [
+                    "7:30 Desayuno",
+                    "8:00 Salir",
+                    "8:45 Santa Maria della Vittoria",
+                    "10:15 San Luigi dei Francesi",
+                    "11:00 Pantheon",
+                    "13:00 Comida en la Casa Generalizia",
+                    "Encuentro con la Comunidad",
+                    "Diálogo con Consejeros / Superior General",
+                    "19:30 Cena en la Casa Madre",
+                    "20:30 Reunión en gran grupo"
+                ],
+                "visitas": [
+                    {
+                        "visita_id": "4.1",
+                        "titulo_visita": "Santa Maria della Vittoria: el éxtasis de Santa Teresa",
+                        "datos_historicos": `
+                            <p>Es una iglesia del S. XVII, ejemplo clave del barroco romano (mármoles, estucos).</p>
+                            <p>Alberga en la <b>Capilla Cornaro</b> la obra maestra de <b>Gian Lorenzo Bernini</b>: el <i>Éxtasis de Santa Teresa</i> (1644-1652).</p>
+                            <p>Bernini no solo hizo la escultura, diseñó la capilla como un <b>"teatro"</b>. La escultura (el ángel con el dardo y la santa en éxtasis) es el "escenario". Bernini usó el concepto de <i>Bel Composto</i> (la bella unión), fusionando arquitectura, escultura y luz.</p>
+                            <p><b>Detalle Teatral (p. 130):</b> A los lados, Bernini esculpió "palcos" donde los miembros de la familia Cornaro (quienes pagaron la capilla) aparecen como espectadores, observando y comentando el milagro.</p>
+                            <p><b>Luz:</b> La escena está iluminada por una ventana oculta (un oculo) que Bernini diseñó específicamente, creando un efecto de luz divina cenital.</p>
+                        `,
+                        "dinamica": `
+                            <p><b>Objetivo:</b> Reflexionar sobre la llamada de Dios y el "rigor" del amor divino.</p>
+                            <p><b>Acción (p. 130-133):</b> Contemplar la escultura mientras se lee la <b>Meditación 177</b> de San Juan Bautista de La Salle para la fiesta de Santa Teresa.</p>
+                            <p><b>Reflexión:</b> El texto del Fundador habla de cómo Dios probó a Teresa con enfermedades y sequedades (el "rigor") y cómo un serafín atravesó su corazón con un "dardo en llamas", impulsándola a Dios (p. 132).</p>
+                        `
+                    },
+                    {
+                        "visita_id": "4.2",
+                        "titulo_visita": "Vocazione di San Matteo: la llamada",
+                        "datos_historicos": `
+                            <p>Visitamos la iglesia de <i>San Luigi dei Francesi</i> (San Luis de los Franceses), el templo nacional de Francia en Roma (S. XVI), financiado por Catalina de Médici (p. 135).</p>
+                            <p>En la <b>Capilla Contarelli</b> se encuentra el ciclo de la Vida de San Mateo, obra maestra de <b>Caravaggio</b> (1599-1600).</p>
+                            <p><b>El Cuadro:</b> <i>La Vocación de San Mateo</i>. Es una obra revolucionaria. Caravaggio usa el <b>tenebrismo</b> (luz y sombra) de forma dramática. Un rayo de luz (la gracia) entra con Jesús e ilumina la taberna oscura donde Mateo (recaudador de impuestos) cuenta dinero.</p>
+                            <p><b>Anacronismo:</b> Jesús y Pedro visten togas atemporales; Mateo y sus compañeros visten ropas del S. XVI, llevando el Evangelio al "presente" del espectador.</p>
+                            <p><b>El Gesto:</b> La mano de Jesús es una cita directa a la mano de Adán en la Capilla Sixtina. Mateo, iluminado, se señala a sí mismo con duda: "¿A mí?".</p>
+                        `,
+                        "dinamica": `
+                            <p><b>Objetivo:</b> Reflexionar sobre la llamada personal de Dios en lo cotidiano.</p>
+                            <p><b>Reflexión (p. 136):</b> "La luz que le llega no es mágica; es la luz que le invita a levantarse y seguir."</p>
+                            <p><b>Acción (p. 136):</b> Contemplar la obra y responder a las preguntas clave: <b>La Luz</b> (¿Qué rincones oscuros de tu "taberna" necesitan luz?), <b>El Gesto</b> (¿Cuál sería tu reacción?), <b>El Cambio</b> (¿Qué rutinas te cuesta modificar?).</p>
+                        `
+                    },
+                    {
+                        "visita_id": "4.3",
+                        "titulo_visita": "Il Pantheon: lo que asegura mi vida",
+                        "datos_historicos": `
+                            <p>Es el edificio mejor conservado de la Antigua Roma. Construido originalmente por Agripa, fue totalmente reconstruido por el emperador <b>Adriano</b> (126 d.C.).</p>
+                            <p>Originalmente fue un templo "a todos los dioses" (<i>Pan-theon</i>). Sobrevivió porque fue convertido en iglesia cristiana en el 609 d.C. (Santa Maria ad Martyres).</p>
+                            <p><b>La Cúpula (p. 139):</b> Es la <b>mayor cúpula de hormigón en masa de la historia</b>, con <b>43.44 metros</b> de diámetro. Es una esfera perfecta: la altura desde el suelo al óculo es la misma que el diámetro.</p>
+                            <p><b>Ingeniería:</b> Para que no colapsara, el hormigón es más ligero en la cima (mezclado con piedra pómez) y más pesado en la base (con travertino).</p>
+                            <p><b>El Óculo:</b> El famoso agujero en el centro mide 9 metros de diámetro. Es la única fuente de luz. Sí, llueve dentro, y el suelo está inclinado para drenar el agua.</p>
+                            <p><b>Tumbas:</b> Contiene las tumbas del pintor <b>Rafael Sanzio</b> y de los primeros reyes de Italia (Vittorio Emanuele II).</p>
+                        `,
+                        "dinamica": `
+                            <p><b>Objetivo:</b> Identificar los "cimientos" o "contrafuertes" de la propia vida.</p>
+                            <p><b>Metáfora (p. 140):</b> La composición se basa en una esfera perfecta (símbolo de perfección). La cúpula se sostiene gracias al muro cilíndrico (el contrafuerte).</p>
+                            <p><b>Acción (p. 140):</b> "¿Has encontrado en tu pasado muros como este? ¿...situaciones, personas, acontecimientos… que te ayuden a mantenerte en pie?". Escribir una lista de esos "soportes".</p>
+                        `
+                    },
+                    {
+                        "visita_id": "4.4",
+                        "titulo_visita": "Casa Generalizia: el corazón internacional del Instituto",
+                        "datos_historicos": `
+                            <p>Es la residencia del Superior General y su Consejo, albergando el gobierno central del Instituto La Salle, que gestiona la misión en más de 80 países (p. 145).</p>
+                            <p>La sede se trasladó de Francia a Bélgica, y finalmente a Roma en <b>1937</b>.</p>
+                            <p>Durante la II Guerra Mundial, la Casa sirvió temporalmente como hospital militar (p. 145).</p>
+                            <p>Alberga el <b>Museo La Salle</b> (con el retrato "Léger" de 1734) y los Archivos Generales, declarados de "interés histórico excepcional" por Italia (p. 146).</p>
+                        `,
+                        "dinamica": `
+                            <p><b>Objetivo:</b> Conectar la experiencia personal con el Instituto global.</p>
+                            <p><b>Acción:</b> La tarde está dedicada al "Encuentro con la Comunidad" de la Casa Generalizia y al "Diálogo con Consejeros / Superior General" (p. 129).</p>
+                        `
+                    }
+                ]
+            },
+            "dia5": {
+                "day_id": "dia5",
+                "titulo_dia": "Día 5: La Salle, un servicio de Iglesia",
+                "url_imagen_cabecera": "https://images.unsplash.com/photo-1528217595493-9463e175bce3?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80",
+                "horario_lista": [
+                    "7:30 Desayuno",
+                    "8:00 Salir",
+                    "8:30 San Pedro",
+                    "11:15 Dinámica: Pietà",
+                    "12:00 Ángelus (si procede)",
+                    "13:00 Comida en la Casa Generalizia",
+                    "Libre",
+                    "18:00 Encuentro con la comunidad de Sant‘Egidio",
+                    "Santa Maria in Trastevere",
+                    "20:00 Cena en Trattoria degli amici"
+                ],
+                "visitas": [
+                    {
+                        "visita_id": "5.1",
+                        "titulo_visita": "Basilica di San Pietro in Vaticano: imágenes de Dios",
+                        "datos_historicos": `
+                            <p>Es la iglesia con el <b>mayor espacio interior del mundo</b> (2,3 hectáreas). La cúpula de Miguel Ángel (136,6 m) es el edificio más alto del centro de Roma (p. 152, 157).</p>
+                            <p><b>La Tumba de San Pedro:</b> Se erige sobre el lugar de enterramiento de San Pedro (en la necrópolis vaticana, junto al Circo de Nerón, donde fue martirizado). El Altar Papal está alineado exactamente sobre su tumba.</p>
+                            <p><b>Excavaciones (1940-1949):</b> El Papa Pío XII ordenó excavar bajo el altar. Encontraron, 11 metros por debajo, la necrópolis y, en su centro, un edículo (pequeña capilla funeraria) del S. II llamado <b>"Trofeo de Gaio"</b>, construido sobre la tumba original.</p>
+                            <p><b>Muros Clave:</b> Esta tumba estaba protegida por un <b>"Muro Rojo"</b> (c. 145 d.C.) y un <b>"Muro G"</b> (posterior). En el Muro G se encontraron grafitis de peregrinos, algunos con el símbolo 'P' (las llaves) o la inscripción <i>"Petros eni"</i> ("Pedro está aquí").</p>
+                            <p><b>Los Huesos:</b> En un lóculo del Muro G se hallaron huesos de un varón (60-70 años) envueltos en <b>tejido de púrpura y oro</b>. El Papa Pablo VI los identificó como los del Apóstol en 1968.</p>
+                            <p><b>El Baldaquino (p. 157):</b> El imponente dosel de bronce sobre el altar (y sobre la tumba) es de <b>Gian Lorenzo Bernini</b>. Se hizo famoso el dicho: "Lo que no destruyeron los bárbaros, lo hicieron los Barberini" (porque el bronce se retiró del Panteón).</p>
+                            <p><b>Estatua de San Pedro (p. 157):</b> La famosa estatua de bronce (S. XIII, atribuida a Arnolfo di Cambio) tiene el pie derecho completamente liso por el roce de millones de peregrinos.</p>
+                            <p><b>La Salle (p. 158):</b> La estatua del Fundador (de 4,65 m) se encuentra en la nave principal, en la galería de los fundadores, encima y a la derecha de la estatua de San Pedro.</p>
+                        `,
+                        "dinamica": `
+                            <p><b>Objetivo:</b> Ver la basílica no como un museo, sino como un lugar de encuentro.</p>
+                            <p><b>Acción (p. 153):</b> Visita por cuenta propia buscando "entre cinco y diez imágenes de Dios (obras de arte, ambientes, personas, situaciones, luz…)" y fotografiarlas o anotarlas.</p>
+                        `
+                    },
+                    {
+                        "visita_id": "5.2",
+                        "titulo_visita": "La Pietà: un Dios que sostiene",
+                        "datos_historicos": `
+                            <p>Obra maestra esculpida por <b>Miguel Ángel</b> entre 1498 y 1499. La talló cuando tenía solo <b>24 años</b>.</p>
+                            <p>Es la <b>única obra que Miguel Ángel firmó</b>. Lo hizo en la cinta que cruza el pecho de la Virgen, después de oír a unos peregrinos atribuírsela a otro artista (p. 159).</p>
+                            <p><b>Polémica (p. 159):</b> En su época fue criticada porque la Virgen (Madre) parece intencionadamente más joven que Jesús (Hijo). Miguel Ángel defendió que la virginidad y la pureza la mantenían eternamente joven.</p>
+                            <p><b>Protección:</b> Desde 1972 está protegida por un cristal blindado, después de que un geólogo la atacara con un martillo al grito de "¡Yo soy Jesucristo!".</p>
+                        `,
+                        "dinamica": `
+                            <p><b>Objetivo:</b> Contemplar la figura de María como la que "sostiene" el dolor del mundo.</p>
+                            <p><b>Acción (p. 160):</b> Contemplación guiada por el texto: "Mira sus manos. Manos que sostienen... Observa su rostro. Es sereno...".</p>
+                            <p><b>Reflexión:</b> "Ella no se derrumba... sostiene no solo su dolor, sino el dolor del mundo entero". El lema final es: "No cargo más. Lo abrazo." (p. 163).</p>
+                        `
+                    },
+                    {
+                        "visita_id": "5.3",
+                        "titulo_visita": "Sant‘Egidio: Dios encarnado",
+                        "datos_historicos": `
+                            <p>La <b>Comunidad de Sant'Egidio</b> es un movimiento laical fundado en Roma en 1968 por Andrea Riccardi, a la luz del Concilio Vaticano II (p. 166).</p>
+                            <p>Reúne a más de 50.000 personas en 70 países. Sus pilares son la **Oración, los Pobres y la Paz**. Tienen un fuerte compromiso con el diálogo interreligioso y la mediación en conflictos internacionales.</p>
+                            <p>Su centro está en la iglesia de Sant'Egidio, en el barrio del Trastevere.</p>
+                            <p><b>Jesús sin hogar (p. 167):</b> La escultura frente a la iglesia, que muestra a Cristo como una persona sin techo durmiendo en un banco, es del escultor Timothy Schmalz y forma parte de una serie de obras que buscan visibilizar el Evangelio de Mateo 25.</p>
+                        `,
+                        "dinamica": `
+                            <p><b>Objetivo:</b> Conectar con la "Iglesia servidora" (en contraste con la "Iglesia poderosa" vista en el Vaticano).</p>
+                            <p><b>Acción:</b> Encuentro con la comunidad y cena en la <i>Trattoria degli amici</i> (restaurante inclusivo de la comunidad) (p. 151).</p>
+                        `
+                    },
+                    {
+                        "visita_id": "5.4",
+                        "titulo_visita": "Santa Maria in Trastevere: luz, clemencia y bálsamo",
+                        "datos_historicos": `
+                            <p>Es una de las iglesias más antiguas de Roma. La tradición dice que es el <b>primer lugar oficial de culto cristiano</b> en la ciudad (S. III), construido en un lugar donde brotó aceite (<i>fons olei</i>) milagrosamente.</p>
+                            <p>Los deslumbrantes <b>mosaicos dorados</b> del ábside (S. XII-XIII) son su característica principal, de clara influencia bizantina.</p>
+                            <p>Destaca el icono de la <i>Madonna della Clemenza</i> (S. VIII), uno de los 5 iconos marianos más antiguos de Roma, que sobrevivió a la iconoclastia (p. 168).</p>
+                        `,
+                        "dinamica": `
+                            <p><b>Objetivo:</b> (Esta visita está integrada en el encuentro de Sant'Egidio. Es un momento de contemplación de la belleza de la Iglesia antigua, conectando luz, clemencia y bálsamo con la figura de María) (p. 168).</p>
+                        `
+                    }
+                ]
+            },
+            "dia6": {
+                "day_id": "dia6",
+                "titulo_dia": "Día 6: A cualquier lugar al que sea enviado",
+                "url_imagen_cabecera": "https://images.unsplash.com/photo-1557701719-c81e9d11520e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80",
+                "horario_lista": [
+                    "7:30 Desayuno",
+                    "8:15 Salida hacia plaza Barberini",
+                    "9:00 Ruta de Gabriel Drolin",
+                    "13:00 Almuerzo en la Casa Generalizia",
+                    "16:00 Salida metro Flaminio",
+                    "17:00 Encuentro con la comunidad educativa de Villa Flaminia",
+                    "Cena en Villa Flaminia"
+                ],
+                "visitas": [
+                    {
+                        "visita_id": "6.1",
+                        "titulo_visita": "La Roma lasalliana delle origini: Siguiendo los pasos de Gabriel Drolin",
+                        "datos_historicos": `
+                            <p><b>Contexto:</b> El H. Gabriel Drolin fue enviado a Roma en 1702 para establecer el Instituto y lograr la aprobación del Papa (p. 194).</p>
+                            <p><b>Dificultades:</b> Enfrentó soledad (su compañero, el H. Gérard, abandonó la misión), barreras idiomáticas, pobreza extrema (dependía del dinero que La Salle le enviaba) y la hostilidad inicial de la Curia.</p>
+                            <p><b>Puntos Clave de la Ruta (p. 194-196):</b></p>
+                            <ul>
+                                <li><b>Via dei Cappuccini, 27:</b> Lugar de su habitación. Placa conmemorativa: "Educó a la infancia necesitada...".</li>
+                                <li><b>Casa dei Mostri (Via Gregoriana, 30):</b> (No visitada por dentro). Sede de la escuela lasaliana de 1756 a 1905. Hoy es la Biblioteca Hertziana. El edificio fue diseñado (S. XVI) por <b>Federico Zuccari</b> con puertas y ventanas como fauces de monstruos.</li>
+                                <li><b>Otto Cantoni (Largo de Lombardi):</b> Plaza desaparecida (hoy restaurante "La Capricciosa"). Aquí tenía su humilde escuela-habitación en 1705, donde enseñaba gratis.</li>
+                                <li><b>Chiesa di San Lorenzo in Lucina:</b> Aquí comenzó como catequista en 1704, sentando las bases de su misión. La iglesia también alberga la tumba del pintor francés **Nicolas Poussin**.</li>
+                            </ul>
+                        `,
+                        "dinamica": `
+                            <p><b>Objetivo:</b> Conectar la perseverancia, soledad y fe de Gabriel Drolin con la propia vocación, a través de la correspondencia del Fundador.</p>
+                            <p><b>Preparación (Logística del Animador):</b> El grupo general se divide en <b>5 subgrupos</b> (según el *Esbozo Ruta Drolin*). Es fundamental explicar que cada subgrupo seguirá un <b>orden de visita (ruta) diferente</b> para las 5 paradas, evitando así aglomeraciones.</p>
+                            <p><b>Acción (En cada parada):</b> Al llegar a cada uno de los 5 lugares, el subgrupo abre el sobre con la carta correspondiente de La Salle a Drolin. Tras la lectura de la carta, se invita a la reflexión y al diálogo (o escritura personal), respondiendo a la pregunta de Drolin desde la propia vida.</p>
+                            <p><b>Guía de Cartas y Temas:</b></p>
+                            <ul>
+                                <li><b>1. Via dei Cappuccini:</b> (Carta C14). <b>Tema:</b> El inicio, la incertidumbre, ¿cómo enfrentas lo desconocido?</li>
+                                <li><b>2. Casa dei Mostri:</b> (Carta C21). <b>Tema:</b> Las dificultades, la soledad, ¿cómo te sostienes en la adversidad?</li>
+                                <li><b>3. Otto Cantoni:</b> (Carta C17). <b>Tema:</b> La persistencia, los pequeños logros, ¿cómo los valoras?</li>
+                                <li><b>4. San Lorenzo in Lucina:</b> (Carta C25). <b>Tema:</b> La misión y la fe, ¿cómo conectas tu acción diaria con tu espiritualidad?</li>
+                                <li><b>5. Collegio San Giuseppe:</b> (Carta C32). <b>Tema:</b> El legado, los frutos, ¿qué huella te gustaría dejar?</li>
+                            </ul>
+                        `
+                    },
+                    {
+                        "visita_id": "6.2",
+                        "titulo_visita": "La Salle in Italia (Encuentro en Villa Flaminia)",
+                        "datos_historicos": `
+                            <p>El Distrito de Italia (RELEM) tiene 16 obras educativas, 110 Hermanos y casi mil educadores seglares (p. 202).</p>
+                            <p>En Roma hay seis obras, incluyendo el *Collegio San Giuseppe-Istituto De Merode* (Piazza Spagna) y el *Istituto Pio IX* (Aventino).</p>
+                            <p>La dinámica de la tarde es el encuentro con la comunidad de <b>Villa Flaminia</b>.</p>
+                        `,
+                        "dinamica": `
+                            <p><b>Objetivo:</b> Conectar la ruta histórica de Drolin (el pasado) con la comunidad lasaliana viva de Roma (el presente).</p>
+                            <p><b>Acción:</b> Encuentro con la comunidad educativa de Villa Flaminia y Cena (p. 193).</p>
+                        `
+                    }
+                ]
+            },
+            "dia7": {
+                "day_id": "dia7",
+                "titulo_dia": "Día 7: Cara a cara con el Fundador",
+                "url_imagen_cabecera": "https://images.unsplash.com/photo-1597143432023-3b1069b26f54?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80",
+                "horario_lista": [
+                    "7:30 Desayuno",
+                    "8:00 Salir",
+                    "(Visitas: Circo Massimo, Sant’Anselmo all’Aventino, Santa Sabina, Cavalieri di Malta, Giardino degli aranci)",
+                    "13:00 Cestino",
+                    "Tarde libre",
+                    "19:30 Cena en la Casa Generalizia",
+                    "20:30 Oración en el Santuario"
+                ],
+                "visitas": [
+                    {
+                        "visita_id": "7.1",
+                        "titulo_visita": "El Aventino: mirar desde lo alto",
+                        "datos_historicos": `
+                            <p>Es el "oasis de Roma", una colina de paz en contraste con el caos (p. 210).</p>
+                            <p><b>Historia Antigua (p. 210):</b> En la antigüedad, fue la sede del *Armilustrium* (purificación de armas). Fue zona de la plebe y luego zona aristocrática (Trajano y Adriano vivieron allí).</p>
+                            <p><b>Mito Fundacional:</b> Es la colina donde <b>Remo</b> avistó los pájaros (6 buitres), perdiendo la competición contra Rómulo (que vio 12 en el Palatino) para fundar Roma. Es la colina de la "alternativa".</p>
+                        `,
+                        "dinamica": `
+                            <p><b>Objetivo:</b> Síntesis de la etapa de Roma antes de ir a Nápoles.</p>
+                            <p><b>Acción (p. 211):</b> Dinámica de "La Maleta de la Memoria". El peregrino reflexiona y escribe sobre tres puntos:</p>
+                            <ul>
+                                <li>1. "Lo que dejo en Roma (la piel vieja)".</li>
+                                <li>2. "Lo que cargo en la maleta (el tesoro descubierto)".</li>
+                                <li>3. "La dirección (la mirada al frente / <i>Quo Vadis?</i>)".</li>
+                            </ul>
+                        `
+                    },
+                    {
+                        "visita_id": "7.2",
+                        "titulo_visita": "Sant’ Anselmo",
+                        "datos_historicos": `
+                            <p>Es el punto de partida de la procesión papal del <b>Miércoles de Ceniza</b> (<i>Statio</i>) (p. 210).</p>
+                            <p>Es una iglesia moderna (S. XIX), pero es la sede del **Abad Primado de la Orden Benedictina** (el centro mundial de los Benedictinos).</p>
+                            <p><b>Dato curioso:</b> Es mundialmente famosa por su <b>canto gregoriano</b>. Los monjes cantan las Vísperas (19:15) todos los días.</p>
+                        `,
+                        "dinamica": `
+                            <p>(p. 211) "Este es un buen lugar para iniciar el camino de esta nueva etapa... Siéntate en un banco y toma alguna nota sobre cuáles son los siguientes pasos a dar." (Se invita a realizar aquí la dinámica de "La Maleta de la Memoria").</p>
+                        `
+                    },
+                    {
+                        "visita_id": "7.3",
+                        "titulo_visita": "Santa Sabina",
+                        "datos_historicos": `
+                            <p>Es una de las basílicas paleocristianas <b>más antiguas (S. V)</b> y mejor conservadas de Roma, famosa por su sensación de espacio y luz.</p>
+                            <p>Es el punto final de la <i>Statio</i> de Miércoles de Ceniza, donde el Papa impone la ceniza.</p>
+                            <p><b>Dato curioso:</b> En el atrio, antes de entrar, se encuentra una <b>puerta de madera de ciprés del siglo V</b>. Uno de sus paneles (el superior izquierdo del lado izquierdo) contiene una de las <b>representaciones más antiguas de la Crucifixión</b> en el arte cristiano.</p>
+                            <p>Junto a la iglesia está el <i>Giardino degli aranci</i> (Jardín de los Naranjos), que ofrece una de las vistas más famosas de Roma. Se plantaron naranjos en honor a Santo Domingo, que fundó aquí su orden.</p>
+                        `,
+                        "dinamica": `
+                            <p><b>(Visita cultural y contemplativa, sin dinámica de escritura específica).</b></p>
+                        `
+                    },
+                    {
+                        "visita_id": "7.4",
+                        "titulo_visita": "Il Priorato dei cavalieri di Malta",
+                        "datos_historicos": `
+                            <p>Alberga la embajada de la Orden de Malta. Estas propiedades son <b>extraterritoriales</b> (no es Italia) (p. 215).</p>
+                            <p>La iglesia (Santa María del Priorato) es obra de **Giovanni Battista Piranesi** (S. XVIII), que está enterrado allí (p. 215).</p>
+                            <p><b>La Cerradura (p. 215):</b> Es la famosa "cerradura del Aventino". Si se mira a través de ella, la vista enmarca perfectamente la cúpula de San Pedro, al final de un pasillo de jardines. Alinea tres estados soberanos: Orden de Malta, Italia y Ciudad del Vaticano.</p>
+                        `,
+                        "dinamica": `
+                            <p><b>(Visita cultural, parte del recorrido de "mirar desde lo alto").</b></p>
+                        `
+                    },
+                    {
+                        "visita_id": "7.5",
+                        "titulo_visita": "Celebración Cara a cara con el Fundador",
+                        "datos_historicos": `
+                            <p>(Es la celebración nocturna en el Santuario de la Casa Generalizia, p. 209).</p>
+                        `,
+                        "dinamica": `
+                            <p><b>Objetivo:</b> Síntesis final de la experiencia de Roma y envío misionero.</p>
+                            <p><b>1. Visualización (p. 217):</b> El animador guía un recorrido mental por todas las visitas (Circo Massimo, San Clemente, Quo Vadis, etc.).</p>
+                            <p><b>2. La Crónica (p. 217):</b> Escribir el título que le pondrían a su crónica del viaje.</p>
+                            <p><b>3. Reflexión (p. 217-218):</b> Se conecta el "desconcierto" de la peregrinación con el de los discípulos.</p>
+                            <p><b>4. Envío (p. 218):</b> Lectura de Mt 28 (Envío). Reflexión sobre el linaje cristiano (Pedro, Pablo, mártires, La Salle, Sant'Egidio, Papa León XIV, "tú y yo").</p>
+                            <p><b>5. Carta Final (p. 219):</b> Escritura personal de una carta/diálogo con el Fundador: "¿Qué quiero decirle? ¿Dónde estoy llamado a servir?". Se comparte al final.</p>
+                        `
+                    }
+                ]
+            },
+            "dia8": {
+                "day_id": "dia8",
+                "titulo_dia": "Día 8: La Salle, un servicio a los pobres",
+                "url_imagen_cabecera": "https://images.unsplash.com/photo-1541744670-07e3d191c13f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80",
+                "horario_lista": [
+                    "7:00 Desayuno",
+                    "7:30 Salir hacia Nápoles",
+                    "11:30 Scampìa",
+                    "13:00 Comida",
+                    "15:00 Bus hacia el Hotel",
+                    "18:00 San Gregorio Armeno: Il Presepio napoletano",
+                    "Cena y tiempo libre"
+                ],
+                "visitas": [
+                    {
+                        "visita_id": "8.1",
+                        "titulo_visita": "Transición: Roma queda atrás",
+                        "datos_historicos": `
+                            <p><b>(Página de transición, p. 229)</b>.</p>
+                            <p><b>Mito Fundacional:</b> La leyenda cuenta que Nápoles (<i>Neápolis</i>, "Ciudad Nueva") fue fundada sobre la tumba de la sirena <b>Parténope</b>. Ella fue una de las tres sirenas que intentó seducir a Odiseo; al fracasar, se arrojó al mar y su cuerpo fue arrastrado a esta costa.</p>
+                            <p><b>Dualidad (p. 229):</b> El texto introduce Nápoles como un lugar de "dualidades sorprendentes": "caótica y sublime", "sagrado y profano", "lo oculto (subterráneo) y lo visible".</p>
+                        `,
+                        "dinamica": `
+                            <p><b>Objetivo:</b> Preparar al grupo para el cambio radical de escenario y tono entre Roma y Nápoles. (Lectura en el bus).</p>
+                        `
+                    },
+                    {
+                        "visita_id": "8.2",
+                        "titulo_visita": "Scampia: Un Arcobaleno di anime…",
+                        "datos_historicos": `
+                            <p><b>Contexto:</b> Scampia es un barrio al norte de Nápoles, tristemente famoso por <i>Le Vele</i> (Las Velas), enormes complejos residenciales utópicos que se convirtieron en el mayor foco de tráfico de drogas de Europa, popularizado por el libro y serie <i>Gomorra</i>.</p>
+                            <p><b>La Visita (p. 234):</b> Se visita <b>CasArcobaleno</b>, un espacio educativo lasaliano (escuela de segunda oportunidad, animación, formación) que trabaja para regenerar el tejido social del barrio.</p>
+                        `,
+                        "dinamica": `
+                            <p><b>Objetivo:</b> Reflexionar sobre la esperanza en los lugares más desafiantes (las "periferias" del Evangelio).</p>
+                            <p><b>Reflexión (p. 234):</b> "¿Cómo puedo ser yo una lente capaz de descomponer la luz de la esperanza y reflejarla en mi propia realidad?".</p>
+                        `
+                    },
+                    {
+                        "visita_id": "8.3",
+                        "titulo_visita": "Il presepio napoletano: la realidad soñada",
+                        "datos_historicos": `
+                            <p><b>(Visita a la calle San Gregorio Armeno, p. 233)</b>.</p>
+                            <p><b>El Belén (p. 235):</b> El Belén Napolitano (<i>Presepe</i>) es único. Es el "Evangelio traducido en dialecto napolitano". Es barroco, realista y sarcástico. La ciudad misma (con sus tiendas, tabernas y gentes) se convierte en el escenario del nacimiento.</p>
+                            <p><b>Simbología (p. 236-239):</b> Se explican los personajes clave:</p>
+                            <ul>
+                                <li><b>Benino:</b> El pastorcillo que duerme. El Belén es su sueño. Simboliza la espera.</li>
+                                <li><b>Cazador y Pescador:</b> Dualidad vida/muerte, día/noche.</li>
+                                <li><b>Lavandera:</b> Representa a las parteras; sus sábanas limpias simbolizan la virginidad de María.</li>
+                                <li><b>Vendedores:</b> Representan los 12 meses del año.</li>
+                                <li><b>Ciccibacco:</b> El dios pagano Baco, simbolizando la fina línea entre lo sagrado y lo profano.</li>
+                            </ul>
+                        `,
+                        "dinamica": `
+                            <p><b>Objetivo:</b> Usar la compleja simbología del Belén para sintetizar la propia vocación.</p>
+                            <p><b>Acción (p. 239):</b> Pasear por la calle de San Gregorio Armeno.</p>
+                            <p><b>Reflexión (p. 240-241):</b> Ponerse en el lugar de <i>Benino</i> (el soñador). Reflexionar sobre las dualidades y el rol simbólico personal.</p>
+                        `
+                    }
+                ]
+            },
+            "dia9": {
+                "day_id": "dia9",
+                "titulo_dia": "Día 9: No hay nada que no sea sorprendente",
+                "url_imagen_cabecera": "https://images.unsplash.com/photo-1614002633608-d56d11b59048?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80",
+                "horario_lista": [
+                    "Desayuno",
+                    "10:30 Salir",
+                    "11:00 Nàpoli sotterranea",
+                    "13:00 Comida libre",
+                    "15:45 Sansevero: Il Cristo Velato",
+                    "18:00 Reunión en grupo en el hotel",
+                    "20:00 Cena en el Hotel"
+                ],
+                "visitas": [
+                    {
+                        "visita_id": "9.1",
+                        "titulo_visita": "Nàpoli Sotterranea: cantera y cisterna",
+                        "datos_historicos": `
+                            <p>Bajo Nápoles existe una "ciudad negativa" de túneles y cavidades.</p>
+                            <p><b>Origen (p. 252):</b> Los griegos (S. IV a.C.) fueron los primeros en excavar el subsuelo para extraer el <b><i>tufo</i></b> (roca volcánica "fuerte y fácil de trabajar") y usarlo como material de construcción para la <i>Neápolis</i> (la ciudad de arriba).</p>
+                            <p><b>Uso Romano (p. 253):</b> Los romanos convirtieron estos huecos en un gigantesco sistema de acueductos y cisternas de agua potable.</p>
+                            <p><b>Uso Moderno:</b> Durante la **Segunda Guerra Mundial**, las cisternas vacías se usaron como el principal **refugio antiaéreo** de la ciudad, salvando miles de vidas. Se pueden ver aún restos de instalaciones eléctricas y grafitis de la época.</p>
+                        `,
+                        "dinamica": `
+                            <p><b>Objetivo:</b> Ver el mundo interior no solo como historia (San Clemente), sino como recurso vital.</p>
+                            <p><b>Reflexión (p. 253-254):</b> Nápoles prosperó porque "aprovechó bien sus entrañas".</p>
+                            <p><b>Invitación (p. 254):</b> Identificar la "toba personal" (dones, resiliencia, "material de construcción ideal") y las "cisternas" (reservas de gracia, experiencias de Dios) del alma.</p>
+                        `
+                    },
+                    {
+                        "visita_id": "9.2",
+                        "titulo_visita": "Il Cristo velato",
+                        "datos_historicos": `
+                            <p>Obra maestra de <b>Giuseppe Sanmartino</b> (1753), ubicada en la Capilla Sansevero (p. 257).</p>
+                            <p><b>Técnica:</b> Es famosa por el velo transparente, que fue esculpido magistralmente en el <b>mismo bloque de mármol</b> que el cuerpo.</p>
+                            <p><b>Leyenda (Alquimia):</b> La maestría fue tal que nació la leyenda (falsa) de que el comisionista, <b>Raimondo di Sangro</b> (Príncipe de Sansevero y alquimista), había usado un proceso alquímico para <i>marmolizar</i> un velo real sobre la estatua.</p>
+                            <p><b>Canova (p. 257):</b> El gran escultor neoclásico **Antonio Canova** dijo que "daría diez años de su vida" por haber sido el autor de esa obra.</p>
+                            <p><b>Otras Obras:</b> La capilla también contiene las "Máquinas Anatómicas" (dos cuerpos humanos con el sistema circulatorio visible) y la estatua de "El Desengaño" (una red de pesca esculpida en mármol).</p>
+                        `,
+                        "dinamica": `
+                            <p><b>Objetivo:</b> Una contemplación profunda de la entrega de Cristo y la fe sin ver (Cita de Jn 20, 29).</p>
+                            <p><b>Acción (p. 258):</b> "Guía para contemplar el Cristo Velado". Meditación guiada (o para leer en silencio).</p>
+                            <p><b>Reflexión:</b> "¿Qué velos hay hoy sobre tu vida? ¿Qué partes de ti están ocultas... heridas... dormidas?".</p>
+                            <p><b>Invitación (p. 259):</b> Reconocer a Cristo presente "incluso cuando no lo ves". Grabar una palabra clave.</p>
+                        `
+                    }
+                ]
+            },
+            "dia10": {
+                "day_id": "dia10",
+                "titulo_dia": "Día 10: Y ahora, ¿qué?",
+                "url_imagen_cabecera": "https://images.unsplash.com/photo-1513002749550-c59d786b8e6c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1374&q=80",
+                "horario_lista": [
+                    "Día de cierre y retorno."
+                ],
+                "visitas": [
+                    {
+                        "visita_id": "10.1",
+                        "titulo_visita": "Reflexión de Retorno (Texto)",
+                        "datos_historicos": `
+                            <p>(Esta es la reflexión final del cuaderno, p. 268-269).</p>
+                        `,
+                        "dinamica": `
+                            <p><b>Objetivo:</b> Integrar la experiencia y prepararse para el envío.</p>
+                            <p><b>Reflexión:</b> El texto habla de la mezcla de sentimientos (alegría por el final, tristeza por la partida). Conecta la experiencia con el recorrido del CEL.</p>
+                            <p><b>Invitación (p. 269):</b> Poner nombre a los sentimientos. "¿Qué ha supuesto para ti esta Peregrinación? ¿Qué voy a hacer con todo lo vivido [...] al volver a mi realidad y a mi Misión?".</p>
+                        `
+                    },
+                    {
+                        "visita_id": "10.2",
+                        "titulo_visita": "Visualización final",
+                        "datos_historicos": `
+                            <p>(Esta es la dinámica final guiada por el animador, p. 271-274).</p>
+                        `,
+                        "dinamica": `
+                            <p><b>Objetivo:</b> Recorrer el "mapa emocional" de todo el viaje.</p>
+                            <p><b>Acción:</b> El animador guía una visualización (ojos cerrados) que recorre cronológicamente todas las visitas clave (Maletas, Circo Massimo, San Clemente, Quo Vadis, San Pablo, Don Grandioso/Humilde, Santa Teresa, Vaticano, Sant'Egidio, Drolin, Aventino, Scampia, Nápoles).</p>
+                        `
+                    },
+                    {
+                        "visita_id": "10.3",
+                        "titulo_visita": "Para leer cuando me haya olvidado…",
+                        "datos_historicos": `
+                            <p>(Este es el texto de anclaje final para el futuro, p. 275-276).</p>
+                        `,
+                        "dinamica": `
+                            <p><b>Objetivo:</b> Texto de anclaje final para el futuro.</p>
+                            <p><b>Acción:</b> Es un texto para lectura personal.</p>
+                            <p><b>Reflexión:</b> "Cuando la vida cotidiana te haga dudar de lo que viviste... lee esto. Es un ancla. Es la prueba de que estuviste aquí." Recorre las citas bíblicas clave del viaje (Gn 12, Sal 139, Sal 119, 2 Co 9, Lc 22, Lc 8, Is 6, 1 Co 13, Lc 17, Jn 20, Is 35).</p>
+                        `
+                    }
+                ]
+            }
+        };
+
+        // -----------------------------------------------------------------
+        // LÓGICA DE LA APLICACIÓN (No tocar)
+        // -----------------------------------------------------------------
+
+        let homeScreen, dayScreen, dayButtonsContainer, dayTitle, dayImage, dayHorario, dayVisitas;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            homeScreen = document.getElementById('home-screen');
+            dayScreen = document.getElementById('day-screen');
+            dayButtonsContainer = document.getElementById('day-buttons-container');
+            dayTitle = document.getElementById('day-title');
+            dayImage = document.getElementById('day-image');
+            dayHorario = document.getElementById('day-horario');
+            dayVisitas = document.getElementById('day-visitas');
+
+            buildHomeScreen();
+        });
+
+        function buildHomeScreen() {
+            dayButtonsContainer.innerHTML = '';
+            const sortedDays = Object.values(appData).sort((a, b) => {
+                const dayA = parseInt(a.day_id.replace(/\D/g, ''), 10);
+                const dayB = parseInt(b.day_id.replace(/\D/g, ''), 10);
+                return dayA - dayB;
+            });
+
+            sortedDays.forEach(dia => {
+                if (dia.titulo_dia) { 
+                    const button = document.createElement('button');
+                    button.className = "day-button";
+                    // Tomamos el título (ej: "Día 1: ...") y lo partimos
+                    const parts = dia.titulo_dia.split(':');
+                    const dayLabel = parts[0]; // "Día 1"
+                    const daySubtitle = parts.slice(1).join(':').trim(); // "..."
+                    button.innerHTML = `${dayLabel}<span class="block text-sm opacity-80 font-normal">${daySubtitle}</span>`;
+                    button.onclick = () => showDayScreen(dia.day_id);
+                    dayButtonsContainer.appendChild(button);
+                }
+            });
+        }
+
+        function showDayScreen(dayId) {
+            const dia = appData[dayId];
+            if (!dia) return;
+
+            dayTitle.textContent = dia.titulo_dia;
+            dayImage.src = dia.url_imagen_cabecera;
+
+            dayHorario.innerHTML = '';
+            if (dia.horario_lista && dia.horario_lista.length > 0) {
+                dia.horario_lista.forEach(item => {
+                    const li = document.createElement('li');
+                    li.textContent = item;
+                    dayHorario.appendChild(li);
+                });
+            } else {
+                dayHorario.innerHTML = '<li>No hay horario definido.</li>';
+            }
+
+            dayVisitas.innerHTML = '';
+            if (dia.visitas && dia.visitas.length > 0) {
+                const sortedVisitas = dia.visitas.sort((a, b) => a.visita_id.localeCompare(b.visita_id, undefined, { numeric: true }));
+
+                sortedVisitas.forEach((visita, index) => {
+                    const contentId = `content-${dayId}-${index}`;
+                    const headerId = `header-${dayId}-${index}`;
+
+                    const visitaWrapper = document.createElement('div');
+                    visitaWrapper.className = 'accordion-item rounded-lg';
+                    
+                    visitaWrapper.innerHTML = `
+                        <div id="${headerId}" class="accordion-header p-4 flex justify-between items-center" aria-expanded="false" aria-controls="${contentId}">
+                            <h3 class="text-lg font-semibold text-lasalle-blue">${visita.titulo_visita}</h3>
+                            <svg class="accordion-arrow h-5 w-5 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+                            </svg>
+                        </div>
+                        <div id="${contentId}" class="accordion-content p-4 hidden" role="region" aria-labelledby="${headerId}">
+                            <div class="prose-formatted">
+                                <h4>Datos históricos y cifras</h4>
+                                ${visita.datos_historicos}
+                                <h4>Dinámica propuesta</h4>
+                                ${visita.dinamica}
+                            </div>
+                        </div>
+                    `;
+                    dayVisitas.appendChild(visitaWrapper);
+                    
+                    document.getElementById(headerId).addEventListener('click', () => {
+                        const content = document.getElementById(contentId);
+                        const arrow = document.getElementById(headerId).querySelector('.accordion-arrow');
+                        const isExpanded = content.classList.toggle('hidden');
+                        document.getElementById(headerId).setAttribute('aria-expanded', !isExpanded);
+                        arrow.classList.toggle('rotate-180');
+                    });
+                });
+            } else {
+                dayVisitas.innerHTML = '<p class="text-gray-600">No hay dinámicas programadas para este día.</p>';
+            }
+
+            homeScreen.classList.add('hidden');
+            dayScreen.classList.remove('hidden');
+            window.scrollTo(0, 0); 
+        }
+
+        function showHome() {
+            dayScreen.classList.add('hidden');
+            homeScreen.classList.remove('hidden');
+        }
+
+    </script>
+</body>
+</html>
